@@ -26,10 +26,9 @@ let useFirstMountState = () => {
   initialRef.current
 }
 
-@gentype
-let useSubscription = (source: sourceT<'a>, next: option<'a => unit>) => {
+let useSubscription = (source: sourceT<'a>, nextFn: option<'a => unit>) => {
   React.useEffect0(() => {
-    let next = next->Belt.Option.getWithDefault(ignore)
+    let next = nextFn->Belt.Option.getWithDefault(ignore)
     let subscription = source |> Wonka.subscribe((. value) => next(value))
 
     Some(subscription.unsubscribe)

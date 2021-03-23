@@ -137,6 +137,29 @@ let useSource4 = (initFn: ('a, 'b, 'c, 'd) => sourceT<'e>, inputs: ('a, 'b, 'c, 
   sourceRef.current
 }
 
+let useSource5 = (
+  initFn: ('a, 'b, 'c, 'd, 'e) => sourceT<'f>,
+  inputs: ('a, 'b, 'c, 'd, 'e),
+): sourceT<'f> => {
+  let inputRef = useLazyRef(() => WonkaExtras.makeBehaviorSubject(inputs))
+  let isFirstMount = useFirstMountState()
+  let sourceRef = useLazyRef(() =>
+    inputRef.current.source |> Wonka.switchMap((. values) => {
+      let (a0, a1, a2, a3, a4) = values
+      initFn(a0, a1, a2, a3, a4)
+    })
+  )
+
+  React.useEffect5(() => {
+    if !isFirstMount {
+      inputRef.current.next(inputs)
+    }
+    None
+  }, inputs)
+
+  sourceRef.current
+}
+
 @gentype
 let useSourceState = (source: sourceT<'a>, initialState: option<'a>) => {
   let (state, setState) = React.useState(() => initialState)

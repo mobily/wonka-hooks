@@ -9,3 +9,5 @@ A collection of React hooks for [Wonka](https://github.com/kitten/wonka) and [Wo
 - useSourceEagerState
 - useSourceCallback
 - useSubscription
+- useEventHandler
+- useLazyRef

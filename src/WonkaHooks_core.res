@@ -1,6 +1,7 @@
 open Wonka_types
 
-external unsafeRef: React.ref<Js.undefined<'a>> => React.ref<'a> = "%identity"
+external unsafeReactRef: React.ref<Js.undefined<'a>> => React.ref<'a> = "%identity"
+external unsafeRef: Js.undefined<'a> => 'a = "%identity"
 
 @gentype
 let useLazyRef = (initFn: unit => 'a): React.ref<'a> => {
@@ -11,7 +12,7 @@ let useLazyRef = (initFn: unit => 'a): React.ref<'a> => {
     ref.current = Js.Undefined.return(value)
   }
 
-  unsafeRef(ref)
+  unsafeReactRef(ref)
 }
 
 @gentype
@@ -192,6 +193,8 @@ let useSourceEagerState = (source: sourceT<'a>): 'a => {
       didAsyncEmitRef.current = true
       initialState := Js.Undefined.return(value)
     })
+
+    unsafeRef(initialState.contents)
   })
 
   React.useEffect1(() => {

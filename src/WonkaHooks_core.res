@@ -2,14 +2,15 @@ open Wonka_types
 
 external unsafeReactRef: React.ref<Js.undefined<'a>> => React.ref<'a> = "%identity"
 external unsafeRef: Js.undefined<'a> => 'a = "%identity"
+external uncurry0: (unit => 'a, . unit) => 'a = "%identity"
 
 @gentype
 let useLazyRef = (initFn: unit => 'a): React.ref<'a> => {
   let ref = React.useRef(Js.undefined)
 
   if ref.current == Js.undefined {
-    let value = initFn()
-    ref.current = Js.Undefined.return(value)
+    let initFn = uncurry0(initFn)
+    ref.current = Js.Undefined.return(initFn(.))
   }
 
   unsafeReactRef(ref)
@@ -173,8 +174,8 @@ let useSourceState = (source: sourceT<'a>, initialState: option<'a>) => {
 let useSourceCallback = (initFn: sourceT<'a> => sourceT<'b>) => {
   let subjectRef = useLazyRef(() => Wonka.makeSubject())
   let outputRef = useLazyRef(() => initFn(subjectRef.current.source))
-  let callback = React.useCallback0(input => {
-    subjectRef.current.next(input)
+  let callback = React.useCallback0(arg => {
+    subjectRef.current.next(arg)
   })
 
   (outputRef.current, callback)

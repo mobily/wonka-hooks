@@ -1,7 +1,5 @@
 exports.curryGuaranteePlugin = ({ types: t }) => {
   const curryFnName = /^_{1,}(\d)$/
-  const lengthId = t.identifier('length')
-  const bindId = t.identifier('bind')
 
   const callExpression = path => {
     const property = path.node.callee.property
@@ -24,13 +22,24 @@ exports.curryGuaranteePlugin = ({ types: t }) => {
       return id
     })
 
-    path.replaceWith(
-      t.conditionalExpression(
-        t.binaryExpression('===', t.memberExpression(callFn, lengthId), arityLiteral),
-        t.callExpression(callFn, argIds),
-        t.callExpression(t.memberExpression(callFn, bindId), [t.nullLiteral()].concat(argIds)),
-      ),
-    )
+    if (property.name.includes('__')) {
+      path.replaceWith(callFn)
+    } else {
+      path.replaceWith(
+        t.conditionalExpression(
+          t.binaryExpression(
+            '===',
+            t.memberExpression(callFn, t.identifier('length')),
+            arityLiteral,
+          ),
+          t.callExpression(callFn, argIds),
+          t.callExpression(
+            t.memberExpression(callFn, t.identifier('bind')),
+            [t.nullLiteral()].concat(argIds),
+          ),
+        ),
+      )
+    }
   }
 
   return {

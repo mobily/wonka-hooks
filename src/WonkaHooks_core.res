@@ -53,7 +53,7 @@ let useSource = (initFn: array<'a> => sourceT<'b>, inputs: array<'a>) => {
 }
 
 let useSource0 = (source: sourceT<'a>) => {
-  let sourceRef = React.useRef(source)
+  let sourceRef = useLazyRef(() => source)
   sourceRef.current
 }
 

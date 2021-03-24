@@ -20,7 +20,11 @@ export declare type useSourceState = {
   <T>(source: sourceT<T>, initialState?: T): T | undefined
 }
 export declare type useSubscription = <A>(source: sourceT<A>, nextFn?: (value: A) => void) => void
+export declare type useEventHandler = <A>(
+  initFn: (arg0: A) => sourceT<unknown>,
+) => (arg0: A) => void
 
+export declare const useEventHandler: useEventHandler
 export declare const useSubscription: useSubscription
 export declare const useSource: useSource
 export declare const useSourceState: useSourceState

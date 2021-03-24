@@ -216,3 +216,17 @@ let useSourceEagerState = (source: sourceT<'a>): 'a => {
 
   state
 }
+
+let useEventHandler = (initFn: 'a => sourceT<'b>) => {
+  let subjectRef = useLazyRef(() => Wonka.makeSubject())
+  let inputRef = useLazyRef(() =>
+    subjectRef.current.source |> Wonka.switchMap((. args) => initFn(args))
+  )
+  let callback = React.useCallback0(arg => {
+    subjectRef.current.next(arg)
+  })
+
+  useSubscription(inputRef.current, None)
+
+  callback
+}

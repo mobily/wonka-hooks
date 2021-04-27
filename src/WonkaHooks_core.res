@@ -28,13 +28,79 @@ let useFirstMountState = () => {
   initialRef.current
 }
 
-let useSubscription = (source: sourceT<'a>, nextFn: option<'a => unit>) => {
+let useSubscription = (
+  source: sourceT<'a>,
+  nextFn: option<'a => unit>,
+  inputs: option<array<'b>>,
+) => {
+  React.useEffect1(() => {
+    let next = nextFn->Belt.Option.getWithDefault(ignore)
+    let subscription = source |> Wonka.subscribe((. value) => next(value))
+
+    Some(subscription.unsubscribe)
+  }, Belt.Option.getWithDefault(inputs, []))
+}
+
+let useSubscription0 = (source: sourceT<'a>, nextFn: option<'a => unit>) => {
   React.useEffect0(() => {
     let next = nextFn->Belt.Option.getWithDefault(ignore)
     let subscription = source |> Wonka.subscribe((. value) => next(value))
 
     Some(subscription.unsubscribe)
   })
+}
+
+let useSubscription1 = (source: sourceT<'a>, nextFn: option<'a => unit>, inputs: array<'b>) => {
+  React.useEffect1(() => {
+    let next = nextFn->Belt.Option.getWithDefault(ignore)
+    let subscription = source |> Wonka.subscribe((. value) => next(value))
+
+    Some(subscription.unsubscribe)
+  }, inputs)
+}
+
+let useSubscription2 = (source: sourceT<'a>, nextFn: option<'a => unit>, inputs: ('b, 'c)) => {
+  React.useEffect2(() => {
+    let next = nextFn->Belt.Option.getWithDefault(ignore)
+    let subscription = source |> Wonka.subscribe((. value) => next(value))
+
+    Some(subscription.unsubscribe)
+  }, inputs)
+}
+
+let useSubscription3 = (source: sourceT<'a>, nextFn: option<'a => unit>, inputs: ('b, 'c, 'd)) => {
+  React.useEffect3(() => {
+    let next = nextFn->Belt.Option.getWithDefault(ignore)
+    let subscription = source |> Wonka.subscribe((. value) => next(value))
+
+    Some(subscription.unsubscribe)
+  }, inputs)
+}
+
+let useSubscription4 = (
+  source: sourceT<'a>,
+  nextFn: option<'a => unit>,
+  inputs: ('b, 'c, 'd, 'e),
+) => {
+  React.useEffect4(() => {
+    let next = nextFn->Belt.Option.getWithDefault(ignore)
+    let subscription = source |> Wonka.subscribe((. value) => next(value))
+
+    Some(subscription.unsubscribe)
+  }, inputs)
+}
+
+let useSubscription5 = (
+  source: sourceT<'a>,
+  nextFn: option<'a => unit>,
+  inputs: ('b, 'c, 'd, 'e, 'f),
+) => {
+  React.useEffect5(() => {
+    let next = nextFn->Belt.Option.getWithDefault(ignore)
+    let subscription = source |> Wonka.subscribe((. value) => next(value))
+
+    Some(subscription.unsubscribe)
+  }, inputs)
 }
 
 let useSource = (initFn: array<'a> => sourceT<'b>, inputs: array<'a>) => {
@@ -165,7 +231,7 @@ let useSourceState = (source: sourceT<'a>, initialState: option<'a>) => {
   let (state, setState) = React.useState(() => initialState)
   let next = value => setState(_ => Some(value))
 
-  useSubscription(source, Some(next))
+  useSubscription(source, Some(next), None)
 
   state
 }
@@ -226,7 +292,7 @@ let useEventHandler = (initFn: 'a => sourceT<'b>) => {
     subjectRef.current.next(arg)
   })
 
-  useSubscription(inputRef.current, None)
+  useSubscription(inputRef.current, None, None)
 
   callback
 }

@@ -1,7 +1,9 @@
 const esbuild = require('esbuild')
-const { babel } = require('./plugins/esbuild-babel-plugin')
-const { curryGuaranteePlugin } = require('./plugins/babel-curry-guarantee-plugin')
-const { removeReScriptHooks } = require('./plugins/babel-remove-rescript-hooks-plugin')
+
+const { jscodeshift } = require('./plugins/esbuild-jscodeshift')
+const { uncurryFunctions } = require('./plugins/uncurry-functions')
+const { replaceLiterals } = require('./plugins/replace-literals')
+const { removeRescriptHooks } = require('./plugins/remove-rescript-hooks')
 
 const handleError = () => process.exit(1)
 const build = (outfile, options) => {
@@ -12,27 +14,9 @@ const build = (outfile, options) => {
       format: 'cjs',
       outfile: `dist/${outfile}`,
       plugins: [
-        babel({
-          config: {
-            babelrc: false,
-            exclude: 'node_modules/**',
-            plugins: [
-              [
-                'module-resolver',
-                {
-                  root: ['./src'],
-                  alias: {
-                    'wonka/src/Wonka.bs.js': 'wonka',
-                    '@mobily/wonka-extras/src/WonkaExtras.bs.js': '@mobily/wonka-extras',
-                  },
-                },
-              ],
-              removeReScriptHooks,
-              curryGuaranteePlugin,
-              'closure-elimination',
-              'minify-dead-code-elimination',
-            ],
-          },
+        jscodeshift({
+          exclude: ['node_modules/**'],
+          plugins: [replaceLiterals, uncurryFunctions, removeRescriptHooks],
         }),
       ],
       minify: false,

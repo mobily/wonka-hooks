@@ -107,7 +107,7 @@ let useSource = (initFn: array<'a> => sourceT<'b>, inputs: array<'a>) => {
   let inputRef = useLazyRef(() => WonkaExtras.makeBehaviorSubject(inputs))
   let isFirstMount = useFirstMountState()
   let sourceRef = useLazyRef(() =>
-    inputRef.current.source |> Wonka.switchMap((. inputs) => initFn(inputs))
+    inputRef.current.source |> Wonka.switchMap((. inputs) => initFn(inputs)) |> Wonka.share
   )
 
   React.useEffect1(() => {

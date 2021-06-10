@@ -104,20 +104,25 @@ let useSubscription5 = (
 }
 
 let useSource = (initFn: array<'a> => sourceT<'b>, inputs: array<'a>) => {
-  let inputRef = useLazyRef(() => WonkaExtras.makeBehaviorSubject(inputs))
-  let isFirstMount = useFirstMountState()
-  let sourceRef = useLazyRef(() =>
-    inputRef.current.source |> Wonka.switchMap((. inputs) => initFn(inputs)) |> Wonka.share
-  )
+  if Belt.Array.length(inputs) == 0 {
+    let sourceRef = useLazyRef(() => initFn([]))
+    sourceRef.current
+  } else {
+    let inputRef = useLazyRef(() => WonkaExtras.makeBehaviorSubject(inputs))
+    let isFirstMount = useFirstMountState()
+    let sourceRef = useLazyRef(() =>
+      inputRef.current.source |> Wonka.switchMap((. inputs) => initFn(inputs)) |> Wonka.share
+    )
 
-  React.useEffect1(() => {
-    if !isFirstMount {
-      inputRef.current.next(inputs)
-    }
-    None
-  }, inputs)
+    React.useEffect1(() => {
+      if !isFirstMount {
+        inputRef.current.next(inputs)
+      }
+      None
+    }, inputs)
 
-  sourceRef.current
+    sourceRef.current
+  }
 }
 
 let useSource0 = (source: sourceT<'a>) => {

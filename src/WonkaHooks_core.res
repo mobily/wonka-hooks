@@ -227,9 +227,9 @@ let useSource5 = (
   sourceRef.current
 }
 
-let useSourceState = (source: sourceT<'a>, initialState: option<'a>) => {
+let useSourceState = (source: sourceT<'a>, initialState: 'a) => {
   let (state, setState) = React.useState(() => initialState)
-  let next = value => setState(_ => Some(value))
+  let next = value => setState(_ => value)
 
   useSubscription(source, Some(next), None)
 

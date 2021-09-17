@@ -11,3 +11,5 @@ A collection of React hooks for [Wonka](https://github.com/kitten/wonka) and [Wo
 - useSubscription
 - useEventHandler
 - useLazyRef
+- useSubject
+- useBehaviorSubject

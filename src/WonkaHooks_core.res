@@ -296,3 +296,9 @@ let useEventHandler = (initFn: 'a => sourceT<'b>) => {
 
   callback
 }
+
+@gentype
+let useBehaviorSubject = (initialValue: 'a) =>
+  React.useRef(WonkaExtras.makeBehaviorSubject(initialValue)).current
+
+let useSubject = () => React.useRef(Wonka.makeSubject()).current

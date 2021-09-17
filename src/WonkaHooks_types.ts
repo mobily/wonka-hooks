@@ -1,4 +1,4 @@
-import { sourceT } from 'wonka/src/Wonka_types.gen'
+import { sourceT, subjectT } from 'wonka/src/Wonka_types.gen'
 
 export declare type useSource = {
   <T>(initFn: () => sourceT<T>, inputs: []): sourceT<T>
@@ -27,8 +27,10 @@ export declare type useSubscription = <A>(
 export declare type useEventHandler = <A>(
   initFn: (arg0: A) => sourceT<unknown>,
 ) => (arg0: A) => void
+export declare type useSubject = <A>() => subjectT<A>
 
 export declare const useEventHandler: useEventHandler
 export declare const useSubscription: useSubscription
 export declare const useSource: useSource
 export declare const useSourceState: useSourceState
+export declare const useSubject: useSubject

@@ -1,5 +1,5 @@
 exports.removeRescriptHooks = (j, source) => {
-  const fnName = /^(useSource|useSubscription)(\d)$/
+  const fnName = /^(useSource|useSubscription|useEventHandler)(\d)$/
 
   const root = j(source)
 

@@ -283,16 +283,103 @@ let useSourceEagerState = (source: sourceT<'a>): 'a => {
   state
 }
 
-let useEventHandler = (initFn: 'a => sourceT<'b>) => {
+let useEventHandler = (initFn: 'a => sourceT<'b>, inputs: array<'c>) => {
   let subjectRef = useLazyRef(() => Wonka.makeSubject())
-  let inputRef = useLazyRef(() =>
-    subjectRef.current.source |> Wonka.switchMap((. args) => initFn(args))
-  )
   let callback = React.useCallback0(arg => {
     subjectRef.current.next(arg)
   })
 
-  useSubscription(inputRef.current, None, None)
+  useSubscription(
+    subjectRef.current.source |> Wonka.switchMap((. args) => initFn(args)),
+    None,
+    Some(inputs),
+  )
+
+  callback
+}
+
+let useEventHandler0 = (initFn: 'a => sourceT<'b>) => {
+  let subjectRef = useLazyRef(() => Wonka.makeSubject())
+  let callback = React.useCallback0(arg => {
+    subjectRef.current.next(arg)
+  })
+
+  useSubscription0(subjectRef.current.source |> Wonka.switchMap((. args) => initFn(args)), None)
+
+  callback
+}
+
+let useEventHandler1 = (initFn: 'a => sourceT<'b>, inputs: array<'c>) => {
+  let subjectRef = useLazyRef(() => Wonka.makeSubject())
+  let callback = React.useCallback0(arg => {
+    subjectRef.current.next(arg)
+  })
+
+  useSubscription1(
+    subjectRef.current.source |> Wonka.switchMap((. args) => initFn(args)),
+    None,
+    inputs,
+  )
+
+  callback
+}
+
+let useEventHandler2 = (initFn: 'a => sourceT<'b>, inputs: ('c, 'd)) => {
+  let subjectRef = useLazyRef(() => Wonka.makeSubject())
+  let callback = React.useCallback0(arg => {
+    subjectRef.current.next(arg)
+  })
+
+  useSubscription2(
+    subjectRef.current.source |> Wonka.switchMap((. args) => initFn(args)),
+    None,
+    inputs,
+  )
+
+  callback
+}
+
+let useEventHandler3 = (initFn: 'a => sourceT<'b>, inputs: ('c, 'd, 'e)) => {
+  let subjectRef = useLazyRef(() => Wonka.makeSubject())
+  let callback = React.useCallback0(arg => {
+    subjectRef.current.next(arg)
+  })
+
+  useSubscription3(
+    subjectRef.current.source |> Wonka.switchMap((. args) => initFn(args)),
+    None,
+    inputs,
+  )
+
+  callback
+}
+
+let useEventHandler4 = (initFn: 'a => sourceT<'b>, inputs: ('c, 'd, 'e, 'f)) => {
+  let subjectRef = useLazyRef(() => Wonka.makeSubject())
+  let callback = React.useCallback0(arg => {
+    subjectRef.current.next(arg)
+  })
+
+  useSubscription4(
+    subjectRef.current.source |> Wonka.switchMap((. args) => initFn(args)),
+    None,
+    inputs,
+  )
+
+  callback
+}
+
+let useEventHandler5 = (initFn: 'a => sourceT<'b>, inputs: ('c, 'd, 'e, 'f, 'g)) => {
+  let subjectRef = useLazyRef(() => Wonka.makeSubject())
+  let callback = React.useCallback0(arg => {
+    subjectRef.current.next(arg)
+  })
+
+  useSubscription5(
+    subjectRef.current.source |> Wonka.switchMap((. args) => initFn(args)),
+    None,
+    inputs,
+  )
 
   callback
 }

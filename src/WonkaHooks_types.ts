@@ -26,6 +26,7 @@ export declare type useSubscription = <A>(
 ) => void
 export declare type useEventHandler = <A>(
   initFn: (arg0: A) => sourceT<unknown>,
+  inputs?: any[],
 ) => (arg0: A) => void
 export declare type useSubject = <A>() => subjectT<A>
 

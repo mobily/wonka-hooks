@@ -107,7 +107,7 @@ let useSource = (initFn: array<'a> => sourceT<'b>, inputs: array<'a>) => {
   let inputRef = useLazyRef(() => WonkaExtras.makeBehaviorSubject(inputs))
   let isFirstMount = useFirstMountState()
   let sourceRef = useLazyRef(() =>
-    inputRef.current.source |> Wonka.switchMap((. inputs) => initFn(inputs))
+    inputRef.current.source |> Wonka.switchMap((. inputs) => initFn(inputs)) |> Wonka.share
   )
 
   React.useEffect1(() => {
@@ -121,7 +121,7 @@ let useSource = (initFn: array<'a> => sourceT<'b>, inputs: array<'a>) => {
 }
 
 let useSource0 = (source: sourceT<'a>) => {
-  let sourceRef = useLazyRef(() => source)
+  let sourceRef = useLazyRef(() => Wonka.share(source))
   sourceRef.current
 }
 
@@ -129,7 +129,7 @@ let useSource1 = (initFn: 'a => sourceT<'b>, input: 'a): sourceT<'b> => {
   let inputRef = useLazyRef(() => WonkaExtras.makeBehaviorSubject(input))
   let isFirstMount = useFirstMountState()
   let sourceRef = useLazyRef(() =>
-    inputRef.current.source |> Wonka.switchMap((. input) => initFn(input))
+    inputRef.current.source |> Wonka.switchMap((. input) => initFn(input)) |> Wonka.share
   )
 
   React.useEffect1(() => {
@@ -146,10 +146,12 @@ let useSource2 = (initFn: ('a, 'b) => sourceT<'c>, inputs: ('a, 'b)): sourceT<'c
   let inputRef = useLazyRef(() => WonkaExtras.makeBehaviorSubject(inputs))
   let isFirstMount = useFirstMountState()
   let sourceRef = useLazyRef(() =>
-    inputRef.current.source |> Wonka.switchMap((. values) => {
+    inputRef.current.source
+    |> Wonka.switchMap((. values) => {
       let (a0, a1) = values
       initFn(a0, a1)
     })
+    |> Wonka.share
   )
 
   React.useEffect2(() => {
@@ -166,10 +168,12 @@ let useSource3 = (initFn: ('a, 'b, 'c) => sourceT<'d>, inputs: ('a, 'b, 'c)): so
   let inputRef = useLazyRef(() => WonkaExtras.makeBehaviorSubject(inputs))
   let isFirstMount = useFirstMountState()
   let sourceRef = useLazyRef(() =>
-    inputRef.current.source |> Wonka.switchMap((. values) => {
+    inputRef.current.source
+    |> Wonka.switchMap((. values) => {
       let (a0, a1, a2) = values
       initFn(a0, a1, a2)
     })
+    |> Wonka.share
   )
 
   React.useEffect3(() => {
@@ -188,10 +192,12 @@ let useSource4 = (initFn: ('a, 'b, 'c, 'd) => sourceT<'e>, inputs: ('a, 'b, 'c, 
   let inputRef = useLazyRef(() => WonkaExtras.makeBehaviorSubject(inputs))
   let isFirstMount = useFirstMountState()
   let sourceRef = useLazyRef(() =>
-    inputRef.current.source |> Wonka.switchMap((. values) => {
+    inputRef.current.source
+    |> Wonka.switchMap((. values) => {
       let (a0, a1, a2, a3) = values
       initFn(a0, a1, a2, a3)
     })
+    |> Wonka.share
   )
 
   React.useEffect4(() => {
@@ -211,10 +217,12 @@ let useSource5 = (
   let inputRef = useLazyRef(() => WonkaExtras.makeBehaviorSubject(inputs))
   let isFirstMount = useFirstMountState()
   let sourceRef = useLazyRef(() =>
-    inputRef.current.source |> Wonka.switchMap((. values) => {
+    inputRef.current.source
+    |> Wonka.switchMap((. values) => {
       let (a0, a1, a2, a3, a4) = values
       initFn(a0, a1, a2, a3, a4)
     })
+    |> Wonka.share
   )
 
   React.useEffect5(() => {

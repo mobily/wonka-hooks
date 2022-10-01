@@ -4,6 +4,17 @@ import { makeBehaviorSubject } from '@mobily/wonka-extras'
 
 import { Source, Subscription, makeSubject, pipe, subscribe, switchMap, take } from 'wonka'
 
+import { Resource } from './resource'
+
+const increment = (n: number): number => {
+  return (n + 1) % 1000000
+}
+
+export const useForceUpdate = () => {
+  const [, update] = React.useState(0)
+  return React.useRef(() => update(increment)).current
+}
+
 const useIsomorphicEffect =
   typeof window !== 'undefined' &&
   typeof window.document !== 'undefined' &&
@@ -205,6 +216,29 @@ export const useSourceEagerState = <T>(source: Source<T>): T => {
   }
 
   return state
+}
+
+export const useSourceSuspense = <T, R extends T = T>(resource: Resource<T, R>): R => {
+  const resourceValue = resource.read()
+  const forceUpdate = useForceUpdate()
+  const [state, setState] = React.useState<R>(resourceValue)
+
+  useSubscription(resource.subject.source, value => {
+    if (value) {
+      return setState(value.current)
+    }
+
+    forceUpdate()
+  })
+
+  return state
+}
+
+export const useResource = <T, R extends T = T>(
+  source: Source<T>,
+  isSuccess?: T extends R ? (value: T) => boolean : (value: T) => value is R,
+): Resource<T, R> => {
+  return React.useRef(new Resource(source, isSuccess)).current
 }
 
 export const useBehaviorSubject = <T>(initialValue: T) => {

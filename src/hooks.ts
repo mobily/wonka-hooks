@@ -1,0 +1,216 @@
+import * as React from 'react'
+
+import { makeBehaviorSubject } from '@mobily/wonka-extras'
+
+import { Source, Subscription, makeSubject, pipe, subscribe, switchMap, take } from 'wonka'
+
+const useIsomorphicEffect =
+  typeof window !== 'undefined' &&
+  typeof window.document !== 'undefined' &&
+  typeof window.document.createElement !== 'undefined'
+    ? React.useLayoutEffect
+    : React.useEffect
+
+const useLazyRef = <T>(initFn: () => T): React.MutableRefObject<T> => {
+  const firstMountRef = React.useRef(true)
+  const ref = React.useRef<T>(null as T)
+
+  if (firstMountRef.current === true) {
+    firstMountRef.current = false
+    ref.current = initFn()
+  }
+  return ref
+}
+
+const useFirstMountState = () => {
+  const initialRef = React.useRef(true)
+
+  React.useEffect(() => {
+    initialRef.current = false
+  }, [])
+
+  return initialRef.current
+}
+
+export const useSubscription = <T>(
+  source: Source<T>,
+  nextFn?: (value: T) => void,
+): React.MutableRefObject<Subscription | undefined> => {
+  const subscriptionRef = React.useRef<Subscription>()
+  const sourceRef = React.useRef(source)
+
+  useIsomorphicEffect(() => {
+    sourceRef.current = source
+  })
+
+  React.useEffect(() => {
+    const source = sourceRef.current
+
+    const subscription = pipe(
+      source,
+      subscribe(value => {
+        if (source !== sourceRef.current) {
+          return
+        }
+
+        nextFn?.(value)
+      }),
+    )
+
+    subscriptionRef.current = subscription
+
+    return subscription.unsubscribe
+  }, [source])
+
+  return subscriptionRef
+}
+
+export const useSource = <T, P extends readonly any[]>(
+  initFn: (() => Source<T>) | ((...args: P) => Source<T>),
+  inputs?: [...P],
+) => {
+  if (!inputs) {
+    return useLazyRef(initFn as () => Source<T>).current
+  }
+
+  const inputsRef = useLazyRef(() => {
+    return makeBehaviorSubject(inputs)
+  })
+  const isFirstMount = useFirstMountState()
+  const sourceRef = useLazyRef(() => {
+    return pipe(
+      inputsRef.current.source,
+      switchMap(args => initFn(...args)),
+    )
+  })
+
+  React.useEffect(() => {
+    if (!isFirstMount) {
+      inputsRef.current.next(inputs)
+    }
+  }, inputs)
+
+  return sourceRef.current
+}
+
+export const useSourceEvent = <P extends readonly any[]>(
+  initFn: (...args: P) => Source<any>,
+): ((...args: P) => void) => {
+  const subjectRef = useLazyRef(() => {
+    return makeSubject<P>()
+  })
+  const callback = React.useCallback((...args: P) => {
+    return subjectRef.current.next(args)
+  }, [])
+
+  useSubscription(
+    pipe(
+      subjectRef.current.source,
+      switchMap(args => initFn(...args)),
+    ),
+  )
+
+  return callback
+}
+
+export const useSourceCallback = <O, T = O, P extends readonly any[] = [T]>(
+  initFn: (source: Source<T>) => Source<O>,
+  selectorFn?: (...args: P) => O,
+): readonly [Source<O>, (...args: P) => void] => {
+  const subjectRef = useLazyRef(() => {
+    return makeSubject<T>()
+  })
+
+  const outputRef = useLazyRef(() => {
+    return initFn(subjectRef.current.source)
+  })
+
+  const callback = React.useCallback((...args: P) => {
+    return subjectRef.current.next(selectorFn ? selectorFn(...args) : args[0])
+  }, [])
+
+  return [outputRef.current, callback] as const
+}
+
+type UseSourceState = {
+  <T>(source: Source<T>, initialState: T | (() => T)): T
+  <T>(source: Source<T>, initialState?: T | (() => T)): T | undefined
+}
+
+export const useSourceState: UseSourceState = <T>(source: Source<T>, initialState: T): T => {
+  const [state, setState] = React.useState<T>(initialState)
+
+  useSubscription(source, setState)
+
+  return state
+}
+
+export const useSourceEagerState = <T>(source: Source<T>): T => {
+  const sourceRef = React.useRef(source)
+
+  const isAsyncEmissionRef = React.useRef(false)
+  const didSyncEmitRef = React.useRef(false)
+
+  useIsomorphicEffect(() => {
+    sourceRef.current = source
+  })
+
+  const [state, setState] = React.useState<T>(() => {
+    let contents: T = undefined as T
+
+    const subscription = pipe(
+      source,
+      take(1),
+      subscribe(value => {
+        didSyncEmitRef.current = true
+        contents = value
+      }),
+    )
+
+    subscription.unsubscribe()
+
+    return contents
+  })
+
+  React.useEffect(() => {
+    const source = sourceRef.current
+    let secondInitialValue = state
+
+    const subscription = pipe(
+      source,
+      subscribe(value => {
+        if (source !== sourceRef.current) {
+          return
+        }
+
+        if (isAsyncEmissionRef.current) {
+          setState(value)
+        } else {
+          secondInitialValue = value
+        }
+      }),
+    )
+
+    if (!isAsyncEmissionRef.current && secondInitialValue !== state) {
+      setState(secondInitialValue)
+    }
+
+    isAsyncEmissionRef.current = true
+
+    return subscription.unsubscribe
+  }, [source])
+
+  if (!didSyncEmitRef.current) {
+    throw new Error('[useSourceEagerState]: a source did not synchronously emit a value')
+  }
+
+  return state
+}
+
+export const useBehaviorSubject = <T>(initialValue: T) => {
+  return React.useRef(makeBehaviorSubject<T>(initialValue)).current
+}
+
+export const useSubject = <T>() => {
+  return React.useRef(makeSubject<T>()).current
+}

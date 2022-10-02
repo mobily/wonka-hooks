@@ -60,10 +60,6 @@ export const useSubscription = <T>(
     const subscription = pipe(
       source,
       subscribe(value => {
-        if (source !== sourceRef.current) {
-          return
-        }
-
         nextFn?.(value)
       }),
     )
@@ -71,7 +67,7 @@ export const useSubscription = <T>(
     subscriptionRef.current = subscription
 
     return subscription.unsubscribe
-  }, [source])
+  }, [sourceRef.current !== source])
 
   return subscriptionRef
 }
@@ -190,10 +186,6 @@ export const useSourceEagerState = <T>(source: Source<T>): T => {
     const subscription = pipe(
       source,
       subscribe(value => {
-        if (source !== sourceRef.current) {
-          return
-        }
-
         if (isAsyncEmissionRef.current) {
           setState(value)
         } else {
@@ -209,7 +201,7 @@ export const useSourceEagerState = <T>(source: Source<T>): T => {
     isAsyncEmissionRef.current = true
 
     return subscription.unsubscribe
-  }, [source])
+  }, [sourceRef.current !== source])
 
   if (!didSyncEmitRef.current) {
     throw new Error('[useSourceEagerState]: a source did not synchronously emit a value')

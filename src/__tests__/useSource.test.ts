@@ -33,12 +33,12 @@ describe('useSource', () => {
 
     const { rerender } = renderHook(
       props => {
-        const { ms } = props
+        const { ms, n } = props
         const source = useSource(
-          ms => {
-            return pipe(interval(ms), take(3))
+          (ms, n) => {
+            return pipe(interval(ms), take(n))
           },
-          [ms],
+          [ms, n],
         )
 
         useSubscription(source, spy)
@@ -48,18 +48,20 @@ describe('useSource', () => {
       {
         initialProps: {
           ms: 200,
+          n: 1,
         },
       },
     )
 
-    vi.advanceTimersByTime(600)
+    vi.advanceTimersByTime(200)
 
-    expect(spy.mock.calls).toEqual([[0], [1], [2]])
+    expect(spy.mock.calls).toEqual([[0]])
 
-    rerender({ ms: 300 })
+    rerender({ ms: 300, n: 3 })
 
     vi.advanceTimersByTime(900)
 
-    expect(spy.mock.calls).toEqual([[0], [1], [2], [0], [1], [2]])
+
+    expect(spy.mock.calls).toEqual([[0], [0], [1], [2]])
   })
 })

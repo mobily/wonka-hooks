@@ -1,7 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@mobily/wonka-extras': ^1.0.1
+  '@mobily/wonka-extras': ^1.0.2
   '@testing-library/react-hooks': ^8.0.1
   '@types/node': ^18.7.23
   '@types/react': ^18.0.21
@@ -23,7 +23,7 @@ specifiers:
   wonka: '>=6.1.0'
 
 devDependencies:
-  '@mobily/wonka-extras': 1.0.1
+  '@mobily/wonka-extras': 1.0.2
   '@testing-library/react-hooks': 8.0.1_pfph2cfyfb2ft5retlxppkywlu
   '@types/node': 18.7.23
   '@types/react': 18.0.21
@@ -333,8 +333,8 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.14
     dev: true
 
-  /@mobily/wonka-extras/1.0.1:
-    resolution: {integrity: sha512-phPrYSZmB3lle3avDwPfOn3LI5RnBqBR4tp0BHhoOMWi9WJoFOXf/JC1+5vVGW6ldd04N/gQHbyw1kV+sJbMhg==}
+  /@mobily/wonka-extras/1.0.2:
+    resolution: {integrity: sha512-+FMRr1rTb674zDNpF+vKwaVFlCqL9c2bQEZofUS4xZLLOv0gNaYlcK3kb9IHaOgwAENwI6aZbU7S5Zh+G7/Dgg==}
     dependencies:
       wonka: 6.1.0
     dev: true

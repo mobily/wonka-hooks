@@ -230,7 +230,15 @@ export const useResource = <T, R extends T = T>(
   source: Source<T>,
   isSuccess?: T extends R ? (value: T) => boolean : (value: T) => value is R,
 ): Resource<T, R> => {
-  return React.useRef(new Resource(source, isSuccess)).current
+  const resource = React.useRef(new Resource(source, isSuccess)).current
+
+  React.useEffect(() => {
+    return () => {
+      resource.destroy()
+    }
+  }, [])
+
+  return resource
 }
 
 export const useBehaviorSubject = <T>(initialValue: T) => {

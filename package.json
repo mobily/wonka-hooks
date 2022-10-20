@@ -46,12 +46,12 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@mobily/wonka-extras": ">=1.0.2",
+    "@mobily/wonka-extras": ">=1.0.3",
     "react": ">=16.8.0",
     "wonka": ">=6.1.0"
   },
   "devDependencies": {
-    "@mobily/wonka-extras": "^1.0.2",
+    "@mobily/wonka-extras": "^1.0.3",
     "@testing-library/react-hooks": "^8.0.1",
     "@types/node": "^18.7.23",
     "@types/react": "^18.0.21",

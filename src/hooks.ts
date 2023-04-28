@@ -67,7 +67,7 @@ export const useSubscription = <T>(
     subscriptionRef.current = subscription
 
     return subscription.unsubscribe
-  }, [sourceRef.current !== source])
+  }, [sourceRef.current !== source, nextFn])
 
   return subscriptionRef
 }
@@ -132,9 +132,12 @@ export const useSourceCallback = <O, T = O, P extends readonly any[] = [T]>(
     return initFn(subjectRef.current.source)
   })
 
-  const callback = React.useCallback((...args: P) => {
-    return subjectRef.current.next(selectorFn ? selectorFn(...args) : args[0])
-  }, [])
+  const callback = React.useCallback(
+    (...args: P) => {
+      return subjectRef.current.next(selectorFn ? selectorFn(...args) : args[0])
+    },
+    [selectorFn],
+  )
 
   return [outputRef.current, callback] as const
 }
@@ -234,7 +237,9 @@ export const useResource = <T, R extends T = T>(
 
   React.useEffect(() => {
     return () => {
-      resource.destroy()
+      if (!resource.isDestroyed) {
+        resource.destroy()
+      }
     }
   }, [])
 

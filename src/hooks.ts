@@ -49,9 +49,11 @@ export const useSubscription = <T>(
 ): React.MutableRefObject<Subscription | undefined> => {
   const subscriptionRef = React.useRef<Subscription>()
   const sourceRef = React.useRef(source)
+  const nextRef = React.useRef(nextFn)
 
   useIsomorphicEffect(() => {
     sourceRef.current = source
+    nextRef.current = nextFn
   })
 
   React.useEffect(() => {
@@ -60,14 +62,14 @@ export const useSubscription = <T>(
     const subscription = pipe(
       source,
       subscribe(value => {
-        nextFn?.(value)
+        nextRef.current?.(value)
       }),
     )
 
     subscriptionRef.current = subscription
 
     return subscription.unsubscribe
-  }, [sourceRef.current !== source, nextFn])
+  }, [sourceRef.current !== source, nextRef.current !== nextFn])
 
   return subscriptionRef
 }

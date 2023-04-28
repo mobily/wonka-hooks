@@ -50,6 +50,7 @@ export const useSubscription = <T>(
   const subscriptionRef = React.useRef<Subscription>()
   const sourceRef = React.useRef(source)
   const nextRef = React.useRef(nextFn)
+  const isFirstMount = useFirstMountState()
 
   useIsomorphicEffect(() => {
     sourceRef.current = source
@@ -69,7 +70,7 @@ export const useSubscription = <T>(
     subscriptionRef.current = subscription
 
     return subscription.unsubscribe
-  }, [sourceRef.current !== source, nextRef.current !== nextFn])
+  }, [sourceRef.current !== source, nextRef.current === nextFn && !isFirstMount])
 
   return subscriptionRef
 }
